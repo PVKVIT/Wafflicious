@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waffulicious | Sweet, Crisp and Made with Love</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Sacramento&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================================================================
+        🎨 BRAND PALETTE & CORE
+        ================================================================ */
+        :root {
+            --cream: #f6efe3;
+            --caramel: #d6b48a;
+            --waffle-tan: #e9d8b4;
+            --chocolate: #4b2e1e;
+            --dark-cocoa: #2f1b10;
+            --syrup: #6b3e26;
+            --white-glass: rgba(255, 255, 255, 0.25);
+            --soft-shadow: rgba(75, 46, 30, 0.2);
+            --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Quicksand', sans-serif; }
+        html { scroll-behavior: smooth; }
+        body { background-color: var(--cream); color: var(--dark-cocoa); overflow-x: hidden; line-height: 1.6; }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+            opacity: 0.4; pointer-events: none; z-index: 9999;
+        }
+
+        h1, h2, .brand-font { font-family: 'Sacramento', cursive; }
+
+        /* ================================================================
+        🛒 CART UI
+        ================================================================ */
+        .cart-toggle {
+            position: fixed; bottom: 30px; right: 30px; z-index: 1000;
+            background: var(--chocolate); color: var(--cream);
+            padding: 15px 25px; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); font-weight: 700;
+            display: flex; align-items: center; gap: 10px; transition: var(--transition);
+        }
+        .cart-toggle:hover { transform: scale(1.1); background: var(--syrup); }
+
+        .cart-modal {
+            position: fixed; top: 0; right: -400px; width: 380px; height: 100vh;
+            background: var(--cream); z-index: 1001; box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            transition: 0.5s ease; padding: 40px 20px; display: flex; flex-direction: column;
+        }
+        .cart-modal.open { right: 0; }
+        .cart-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; display: none;
+        }
+        .cart-items { flex-grow: 1; overflow-y: auto; margin-top: 20px; }
+        
+        .cart-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 0; border-bottom: 1px solid var(--waffle-tan); font-weight: 600;
+        }
+        .remove-btn {
+            background: #ffeded; color: #d9534f; border: none; padding: 4px 8px;
+            border-radius: 5px; cursor: pointer; font-size: 0.8rem; margin-left: 10px;
+        }
+        .remove-btn:hover { background: #d9534f; color: white; }
+
+        .cart-total { font-size: 1.5rem; font-weight: 700; padding: 20px 0; border-top: 3px solid var(--chocolate); margin-top: 10px; }
+
+        /* ================================================================
+        💧 DECORATIONS
+        ================================================================ */
+        .drip-container { position: absolute; top: 0; left: 0; width: 100%; z-index: 10; line-height: 0; }
+        .drip-svg { fill: var(--chocolate); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+        .floating-elements { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .doodle { position: absolute; opacity: 0.2; animation: float 15s infinite ease-in-out; }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, 50px) rotate(10deg); }
+            66% { transform: translate(-20px, 80px) rotate(-10deg); }
+        }
+
+        /* ================================================================
+        🍫 HERO
+        ================================================================ */
+        .hero {
+            height: 100vh; display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; text-align: center; position: relative;
+            background: radial-gradient(circle, var(--cream) 0%, var(--waffle-tan) 100%);
+            padding: 20px;
+        }
+        .hero-content { z-index: 5; animation: fadeInScale 1.2s ease-out; }
+        .hero h1 { font-size: clamp(4rem, 15vw, 8rem); color: var(--chocolate); margin-bottom: 10px; }
+        .hero p { font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--syrup); margin-bottom: 30px; }
+
+        /* ================================================================
+        🍴 MENU CARDS
+        ================================================================ */
+        .menu-section { padding: 100px 5%; position: relative; z-index: 2; }
+        .section-title { text-align: center; font-size: 3.5rem; color: var(--chocolate); margin-bottom: 60px; }
+        .menu-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px; max-width: 1400px; margin: 0 auto;
+        }
+        .menu-card {
+            position: relative; height: 450px; border-radius: 30px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 15px 35px var(--soft-shadow);
+            transition: var(--transition); opacity: 0; transform: translateY(30px);
+        }
+        .menu-card.reveal { opacity: 1; transform: translateY(0); }
+        .menu-card:hover { transform: translateY(-10px); }
+
+        .card-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; z-index: 1;
+            transition: transform 1s ease;
+        }
+        .menu-card:hover .card-bg { transform: scale(1.1); }
+
+        .card-glass-frame {
+            position: absolute; inset: 0; z-index: 3;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; padding: 25px; text-align: center; transition: var(--transition);
+        }
+        .menu-card:hover .card-glass-frame {
+            backdrop-filter: blur(0px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .card-glass-frame h3 { color: #fff; font-size: 1.6rem; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+        .card-glass-frame p { color: #fff; font-size: 0.95rem; margin-bottom: 20px; font-weight: 600; text-shadow: 0 1px 5px rgba(0,0,0,0.4); }
+
+        .card-decoration { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+        .snowflake { position: absolute; color: rgba(255,255,255,0.6); font-size: 1.2rem; animation: cardFall 6s infinite linear; }
+        @keyframes cardFall {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(450px) rotate(360deg); opacity: 0; }
+        }
+
+        .add-btn {
+            background: var(--chocolate); color: var(--cream); border: none;
+            padding: 10px 25px; border-radius: 50px; cursor: pointer;
+            font-weight: 700; text-transform: uppercase; transition: var(--transition);
+        }
+        .add-btn:hover { background: #fff; color: var(--chocolate); transform: scale(1.05); }
+
+        /* ================================================================
+        ✨ REVIEWS SECTION (NEW)
+        ================================================================ */
+        .reviews-section { padding: 100px 5%; background: var(--cream); position: relative; }
+        .reviews-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 30px; max-width: 1200px; margin: 0 auto; 
+        }
+        .review-card {
+            background: white; padding: 40px 30px; border-radius: 30px;
+            box-shadow: 0 15px 30px var(--soft-shadow);
+            border: 1px solid var(--waffle-tan);
+            transition: var(--transition);
+            opacity: 0; transform: translateY(40px);
+            position: relative; overflow: hidden;
+        }
+        .review-card.reveal { opacity: 1; transform: translateY(0); }
+        .review-card::before {
+            content: "“"; position: absolute; top: -10px; left: 20px;
+            font-size: 8rem; font-family: 'Sacramento'; color: var(--waffle-tan); opacity: 0.3;
+        }
+        .review-card:hover { transform: scale(1.03); border-color: var(--caramel); }
+        .review-text { font-style: italic; margin-bottom: 20px; font-weight: 500; position: relative; z-index: 2; }
+        .review-author { font-weight: 700; color: var(--syrup); display: block; }
+        .review-stars { color: #f39c12; margin-top: 5px; }
+
+        /* ================================================================
+        📖 CONTINUOUS GALLERY (FIXED)
+        ================================================================ */
+        .gallery-wrap { padding: 80px 0; overflow: hidden; background: var(--waffle-tan); }
+        .gallery-track { 
+            display: flex; 
+            width: fit-content; /* Allow track to be as wide as content */
+            animation: scrollGallery 20s linear infinite; 
+        }
+        .gallery-item { width: 230px; height: 230px; margin: 0 10px; border-radius: 20px; flex-shrink: 0; overflow: hidden; box-shadow: 0 10px 15px var(--soft-shadow); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Keyframe for seamless loop: Translate by exactly half of the total width (since content is duplicated) */
+        @keyframes scrollGallery { 
+            0% { transform: translateX(0); } 
+            100% { transform: translateX(-50%); } 
+        }
+        .gallery-wrap:hover .gallery-track { animation-play-state: paused; }
+
+        /* ================================================================
+        📍 MAP & STORY
+        ================================================================ */
+        .story-section { background: var(--chocolate); color: var(--cream); padding: 120px 10% 100px; position: relative; text-align: center; margin-top: 50px; }
+        .wave-top { position: absolute; top: -1px; left: 0; width: 100%; fill: var(--cream); line-height: 0; }
+        .heart-icon { font-size: 3rem; margin-bottom: 20px; display: inline-block; animation: heartBeat 1.5s infinite; }
+        @keyframes heartBeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        .map-section { padding: 100px 5%; background: var(--cream); text-align: center; }
+        .map-container { max-width: 1000px; margin: 40px auto 0; height: 450px; border-radius: 35px; overflow: hidden; border: 8px solid white; box-shadow: 0 20px 40px var(--soft-shadow); }
+        iframe { width: 100%; height: 100%; border: 0; }
+
+        .footer { padding: 80px 5% 120px; background: var(--dark-cocoa); color: var(--caramel); text-align: center; }
+        
+        .contact-btn-fixed {
+            background: #fff; color: var(--chocolate); padding: 12px 30px;
+            border-radius: 50px; text-decoration: none; font-weight: 700;
+            display: inline-block; margin-top: 20px; border: 2px solid var(--chocolate);
+            transition: var(--transition);
+        }
+        .contact-btn-fixed:hover { background: var(--chocolate); color: #fff; transform: translateY(-3px); }
+
+    </style>
+</head>
+<body>
+
+    <div class="cart-overlay" id="overlay"></div>
+    <div class="cart-toggle" onclick="toggleCart()">
+        🛒 <span id="cart-count">0</span> Items
+    </div>
+
+    <div class="cart-modal" id="cart-modal">
+        <h2 class="brand-font" style="font-size: 3.5rem; color: var(--chocolate);">My Cart</h2>
+        <div class="cart-items" id="cart-list"></div>
+        <div class="cart-total">Total: ₹<span id="total-price">0</span></div>
+        <button class="add-btn" style="width: 100%;" onclick="alert('Proceeding to Checkout!')">Order Now</button>
+        <p onclick="toggleCart()" style="text-align: center; margin-top: 20px; cursor: pointer; text-decoration: underline; font-weight: 700;">Back to Menu</p>
+    </div>
+
+    <div class="drip-container">
+        <svg class="drip-svg" viewBox="0 0 1440 150" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,0 L1440,0 L1440,80 C1400,100 1360,120 1300,110 C1220,95 1180,40 1100,45 C1020,50 980,110 900,115 C820,120 780,60 700,65 C620,70 580,130 500,135 C420,140 380,80 300,85 C220,90 180,145 100,135 C50,130 20,110 0,90 Z"></path>
+        </svg>
+    </div>
+
+    <div class="floating-elements" id="doodle-container"></div>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Waffulicious</h1>
+            <p>Sweet, Crisp and Made with Love</p>
+            <a href="#menu" class="add-btn" style="padding: 15px 40px;">View Menu</a>
+        </div>
+    </section>
+
+    <section class="menu-section" id="menu">
+        <h2 class="section-title">Our Cravings</h2>
+        <div class="menu-grid">
+            <div class="menu-card" data-name="Luscious Classic" data-price="99">
+                <div class="card-bg" style="background-image: url('luciousclassic.png');"></div>
+                <div class="card-decoration"></div>
+                <div class="card-glass-frame">
+                    <h3>Luscious Classic</h3>
+                    <p>Vanilla base, Layered with butter</p>
+                    <button class="add-btn">Add • ₹99</button>
+                </div>
+            </div>
+
+            <div class="menu-card" data-name="Honeycomb Crumb" data-price="99">
+                <div class="card-bg" style="background-image: url('honeycombcrumb.png');"></div>
+                <div class="card-decoration"></div>
+                <div class="card-glass-frame">
+                    <h3>Honeycomb Crumb</h3>
+                    <p>Vanilla base, honey and butter</p>
+                    <button class="add-btn">Add • ₹99</button>
+                </div>
+            </div>
+
+            <div class="menu-card" data-name="Velvet Dream" data-price="119">
+                <div class="card-bg" style="background-image: url('velvetdream.png');"></div>
+                <div class="card-decoration"></div>
+                <div class="card-glass-frame">
+                    <h3>Velvet Dream</h3>
+                    <p>Red Velvet base, white chocolate</p>
+                    <button class="add-btn">Add • ₹119</button>
+                </div>
+            </div>
+
+            <div class="menu-card" data-name="Nutty Kiss" data-price="125">
+                <div class="card-bg" style="background-image: url('nuttykiss.png');"></div>
+                <div class="card-decoration"></div>
+                <div class="card-glass-frame">
+                    <h3>Nutty Kiss</h3>
+                    <p>Milk chocolate, choco chips and almond</p>
+                    <button class="add-btn">Add • ₹125</button>
+                </div>
+            </div>
+            
+            <div class="menu-card" data-name="Choco Bomb" data-price="135">
+                <div class="card-bg" style="background-image: url('chocobomb.png');"></div>
+                <div class="card-decoration"></div>
+                <div class="card-glass-frame">
+                    <h3>Choco Bomb</h3>
+                    <p>Dark chocolate, brownie and sprinkles</p>
+                    <button class="add-btn">Add • ₹135</button>
+                </div>
+            </div>
+
+            <div class="menu-card" data-name="Color Pop Stick" data-price="69">
+                <div class="card-bg" style="background-image: url('colorpopstick.png');"></div>
+                <div class="card-decoration"></div>
+                <div class="card-glass-frame">
+                    <h3>Color Pop Stick</h3>
+                    <p>Any base and chocolate with sprinkles</p>
+                    <button class="add-btn">Add • ₹69</button>
+                </div>
+            </div>
+
+            <div class="menu-card" data-name="Biscoff Bliss" data-price="149">
+                <div class="card-bg" style="background-image: url('biscoffbliss.png');"></div>
+                <div class="card-decoration"></div>
+                <div class="card-glass-frame">
+                    <h3>Biscoff Bliss</h3>
+                    <p>Lotus Biscoff spread with cookie bits</p>
+                    <button class="add-btn">Add • ₹149</button>
+                </div>
+            </div>
+
+            <div class="menu-card" data-name="Oreo Overload" data-price="129">
+                <div class="card-bg" style="background-image: url('oreooverload.png');"></div>
+                <div class="card-decoration"></div>
+                <div class="card-glass-frame">
+                    <h3>Oreo Overload</h3>
+                    <p>Crushed Oreo and Milk Chocolate</p>
+                    <button class="add-btn">Add • ₹129</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="reviews-section">
+        <h2 class="section-title">Customer Whispers</h2>
+        <div class="reviews-grid">
+            <div class="review-card">
+                <p class="review-text">"WTFF!!! Semmayaaa irunchiiii hehehe"</p>
+                <span class="review-author">— Kunjesh</span>
+                <div class="review-stars">★★★★★</div>
+            </div>
+            <div class="review-card">
+                <p class="review-text">"Deiiii waffleeee nalllaaaaaa irundhuchuuuuu daaaaaaa"</p>
+                <span class="review-author">— Chinna Koodhiyan</span>
+                <div class="review-stars">★★★★★</div>
+            </div>
+            <div class="review-card">
+                <p class="review-text">"Mama chikkom ah irukummm waffulisious dhan pooleyy"</p>
+                <span class="review-author">— Pradhyumnan S</span>
+                <div class="review-stars">★★★★★</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="story-section">
+        <svg class="wave-top" viewBox="0 0 1440 100"><path d="M0,0 C480,100 960,100 1440,0 L1440,0 L0,0 Z"></path></svg>
+        <div class="story-content">
+            <span class="heart-icon">🧇</span>
+            <h2 class="section-title" style="color: var(--cream);">Made With Love</h2>
+            <p>Every Waffulicious creation starts with a dream and ends with a crunch.</p>
+        </div>
+    </section>
+
+    <section class="gallery-wrap">
+        <div class="gallery-track">
+            <div class="gallery-item"><img src="luciousclassic.png"></div>
+            <div class="gallery-item"><img src="honeycombcrumb.png"></div>
+            <div class="gallery-item"><img src="velvetdream.png"></div>
+            <div class="gallery-item"><img src="chocobomb.png"></div>
+            <div class="gallery-item"><img src="colorpopstick.png"></div>
+            <div class="gallery-item"><img src="biscoffbliss.png"></div>
+            <div class="gallery-item"><img src="oreooverload.png"></div>
+            <div class="gallery-item"><img src="nuttykiss.png"></div>
+        </div>
+    </section>
+
+    <section class="map-section">
+        <h2 class="section-title">Visit Our Shop</h2>
+        <div class="map-container">
+<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.0719642034314!2d80.16161997514668!3d13.031089187289771!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5261afea9856e1%3A0xdb3ce66940b1a2bd!2sWaffluscious!5e0!3m2!1sen!2sin!4v1767811623863!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>        </div>
+    </section>
+
+    <footer class="footer">
+        <h2 class="brand-font" style="font-size: 4rem;">Waffulicious</h2>
+        <div class="footer-info">
+            <p>📞 +91 93427 22192</p> 
+            <p>📸 @Waffluscious</p>
+        </div>
+        <a href="mailto:hello@waffulicious.com" class="contact-btn-fixed">Contact Us Now</a>
+        <p style="margin-top: 40px; opacity: 0.6;">© 2026 Waffulicious Dessert Co. Stay Sweet.</p>
+    </footer>
+
+    <script>
+        // 1. FLOATING DOODLES
+        const doodleContainer = document.getElementById('doodle-container');
+        const emojis = ['🧇', '🍫', '✨', '🍓'];
+        function createDoodles() {
+            for (let i = 0; i < 15; i++) {
+                const d = document.createElement('div');
+                d.className = 'doodle';
+                d.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                d.style.left = Math.random() * 100 + 'vw';
+                d.style.top = Math.random() * 100 + 'vh';
+                d.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                doodleContainer.appendChild(d);
+            }
+        }
+        createDoodles();
+
+        // 2. CARD SNOWFLAKES
+        document.querySelectorAll('.card-decoration').forEach(box => {
+            for(let i=0; i<6; i++) {
+                let s = document.createElement('span');
+                s.className = 'snowflake';
+                s.innerText = '❄️';
+                s.style.left = Math.random() * 100 + '%';
+                s.style.animationDelay = Math.random() * 5 + 's';
+                box.appendChild(s);
+            }
+        });
+
+        // 3. CART LOGIC
+        let cart = [];
+        const cartModal = document.getElementById('cart-modal');
+        const overlay = document.getElementById('overlay');
+
+        function toggleCart() {
+            cartModal.classList.toggle('open');
+            overlay.style.display = cartModal.classList.contains('open') ? 'block' : 'none';
+        }
+
+        document.querySelectorAll('.add-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const card = e.target.closest('.menu-card');
+                if(!card) return;
+                const name = card.dataset.name;
+                const price = parseInt(card.dataset.price);
+                cart.push({ id: Date.now() + Math.random(), name, price });
+                updateCart();
+                btn.innerText = "Added! ✨";
+                setTimeout(() => btn.innerText = `Add • ₹${price}`, 800);
+            });
+        });
+
+        function removeItem(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+        }
+
+        function updateCart() {
+            const list = document.getElementById('cart-list');
+            const totalSpan = document.getElementById('total-price');
+            const countSpan = document.getElementById('cart-count');
+            list.innerHTML = "";
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price;
+                let div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <div><p style="margin:0">${item.name}</p><small>₹${item.price}</small></div>
+                    <button class="remove-btn" onclick="removeItem(${item.id})">Remove</button>`;
+                list.appendChild(div);
+            });
+            totalSpan.innerText = total;
+            countSpan.innerText = cart.length;
+        }
+
+        overlay.addEventListener('click', toggleCart);
+
+        // 4. SCROLL REVEAL (FOR MENU AND REVIEWS)
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('reveal'); });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.menu-card, .review-card').forEach(c => obs.observe(c));
+
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelectorAll('.doodle').forEach((d, i) => {
+                d.style.transform = `translateY(${scrolled * (0.05 + i * 0.01)}px) rotate(${scrolled * 0.1}deg)`;
+            });
+        });
+    </script>
+</body>
+</html>
