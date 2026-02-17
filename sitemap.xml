@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+<url>
+<loc>https://waffulicious.com/</loc>
+<priority>1.00</priority>
+</url>
+
+<url>
+<loc>https://waffulicious.com/#menu</loc>
+<priority>0.90</priority>
+</url>
+
+<url>
+<loc>https://waffulicious.com/#reviews</loc>
+<priority>0.80</priority>
+</url>
+
+<url>
+<loc>https://waffulicious.com/#gallery</loc>
+<priority>0.80</priority>
+</url>
+
+<url>
+<loc>https://waffulicious.com/#location</loc>
+<priority>0.85</priority>
+</url>
+
+</urlset>
